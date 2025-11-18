@@ -5,7 +5,7 @@ const config ={
     physics:{
         default:"arcade",
         arcade:{
-            gravity:{y:1500},
+            gravity:{y:800},
             debug:false
         }
     },
@@ -21,14 +21,15 @@ const game = new Phaser.Game(config);
 let player;
 let cursors;
 let ground;
+let swords;
 
 function preload(){
     this.load.image("player",'Steve.png');
     this.load.image("enemy",'Garrett.png');
     this.load.image("arena",'Arena.jpg');
     this.load.image("ground",'ground.png');
-    this.load.image("Sword1",'Sword1.gif');
-    this.load.image("Sword2",'Sword2.png');
+    this.load.image("sword1",'Sword1.gif');
+    this.load.image("sword2",'Sword2.png');
 }
 
 function create(){
@@ -44,11 +45,18 @@ function create(){
     player.setCollideWorldBounds(true);
     this.physics.add.collider(player,ground)
 
-    enemy = this.physics.add.sprite(1300,300,"enemy");
+    enemy = this.physics.add.sprite(1300,290,"enemy");
     enemy.setScale(0.25);
     enemy.setBounce(0.2);
     enemy.setCollideWorldBounds(true);
     this.physics.add.collider(enemy,ground)
+    enemy.setVelocityX(500)
+
+    swords = this.physics.add.group({
+        defaultKey:"sword1",
+        maxSize:5,
+        runChildUpdate:true
+    })
 
     cursors = this.input.keyboard.createCursorKeys();
 }
@@ -62,6 +70,15 @@ function update(){
     }
     else if (cursors.up.isDown){
         player.y -= 3;
+    }
+    if(enemy.body.blocked.left){
+        enemy.setVelocityX(150)
+    }
+    if(enemy.body.blocked.right){
+        enemy.setVelocityX(-150)
+    }
+    if(Phaser.Input.Keyboard.JustDown(cursors.space)){
+        playerSwords();
     }
 }
 
