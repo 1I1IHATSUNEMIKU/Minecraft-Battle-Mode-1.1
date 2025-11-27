@@ -22,6 +22,7 @@ let player;
 let cursors;
 let ground;
 let swords;
+let playerDirection = "right"
 
 function preload(){
     this.load.image("player",'Steve.png');
@@ -64,9 +65,11 @@ function create(){
 function update(){
     if(cursors.left.isDown){
         player.x -= 3;
+        playerDirection ="left"
     }
     else if(cursors.right.isDown){
         player.x += 3;
+        playerDirection ="right"
     }
     else if (cursors.up.isDown){
         player.y -= 3;
@@ -82,3 +85,17 @@ function update(){
     }
 }
 
+function playerSwords(){
+    const sword = swords.get(player.x,player.y-20);
+    if(sword){
+        sword.setActive(true).setVisible(true).setScale(0.3);
+        sword.body.enable = true;
+        sword.body.allowGravity = false;
+        if(playerDirection === 'right'){
+            sword.setVelocityX(300)
+        }
+        else{
+            sword.setVelocityX(-300)
+        }
+    }
+}
