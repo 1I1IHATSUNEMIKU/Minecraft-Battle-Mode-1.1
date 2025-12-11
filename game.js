@@ -59,7 +59,19 @@ function create(){
         runChildUpdate:true
     })
 
+     swords2 = this.physics.add.group({
+        defaultKey:"sword2",
+        maxSize:5,
+        runChildUpdate:true
+    })
+
     cursors = this.input.keyboard.createCursorKeys();
+    
+    this.time.addEvent({
+        delay:4000,
+        callback: () => enemySword.call(this),
+        loop: true
+    })
 }
 
 function update(){
@@ -98,4 +110,17 @@ function playerSwords(){
             sword.setVelocityX(-300)
         }
     }
+}
+
+function enemySword(){
+    const sword = swords2.get(enemy.x,enemy.y);
+    if(!sword) return;
+    sword.enableBody(true,enemy.x,enemy.y,true);
+    sword.setScale(0.15);
+    sword.setActive(true);
+    sword.setVisible(true);
+    sword.body.setAllowGravity(false);
+    const speed = -250;
+    sword.setCollideWorldBounds(false);
+    sword.body.onWorldBounds=true;
 }
