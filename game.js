@@ -22,7 +22,9 @@ let player;
 let cursors;
 let ground;
 let swords;
-let playerDirection = "right"
+let playerDirection = "right";
+let playerLife =20;
+let playerInvincible=false
 
 function preload(){
     this.load.image("player",'Steve.png');
@@ -62,16 +64,24 @@ function create(){
      swords2 = this.physics.add.group({
         defaultKey:"sword2",
         maxSize:5,
-        runChildUpdate:true
+        //runChildUpdate:true
     })
 
     cursors = this.input.keyboard.createCursorKeys();
     
     this.time.addEvent({
         delay:4000,
-        callback: () => enemySword.call(this),
+        callback: enemySword,
+        callbackScope:this,
         loop: true
     })
+
+    this.physics.world.on('worldbounds',(body) => {
+        body.gameObject.setActive(false);
+        body.gameObject.setVisible(false)
+    })
+
+    this.physics.add.overlap(player,swords2,hitPlayer,null,this)
 }
 
 function update(){
@@ -115,12 +125,34 @@ function playerSwords(){
 function enemySword(){
     const sword = swords2.get(enemy.x,enemy.y);
     if(!sword) return;
-    sword.enableBody(true,enemy.x,enemy.y,true);
-    sword.setScale(0.15);
+    
     sword.setActive(true);
     sword.setVisible(true);
-    sword.body.setAllowGravity(false);
-    const speed = -250;
-    sword.setCollideWorldBounds(false);
+    sword.setScale(0.15);
+
+    sword.body.enable = true;
+    sword.body.allowGravity=false;
+    sword.setCollideWorldBounds(true);
     sword.body.onWorldBounds=true;
+
+    const direction = player.x < enemy.x ? -250 : 250;
+    sword.setVelocityX(direction);
+}
+
+function hitPlayer(player,sword){
+    if (playerInvincible) return;
+
+    playerInvincible = true;
+    playerLife -= 10;
+
+    sword.setActive(false);
+    sword.setVisible(false);
+    sword.body.enable = false;
+
+    player.setTint(0xff0000);
+
+    player.scene.time.delayedCall(1000,() => {
+        player.clearTint();
+        playerInvincible = false
+    })
 }
